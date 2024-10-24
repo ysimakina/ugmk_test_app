@@ -23,6 +23,13 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      semi: ['error', 'always'],
+      'eol-last': ['error', 'always'],
+      quotes: ['error', 'single'],
+      'max-len': ['error', { code: 100 }],
+      'consistent-return': 0,
+      indent: ['error', 2, { "SwitchCase": 1 }],
+      "jsx-quotes": ["error", "prefer-double"]
     },
   },
 )
