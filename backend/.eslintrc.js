@@ -21,5 +21,11 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'no-param-reassign': 0,
+    'max-len': ['error', { code: 80 }],
+    'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
+    'consistent-return': 0,
+    indent: ['error', 2],
+    'eol-last': ['error', 'always'],
   },
 };
