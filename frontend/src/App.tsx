@@ -1,9 +1,13 @@
 import BarChart from './BarChart';
+import { Routes, Route } from 'react-router-dom'; 
+import DetailChart from './DetailChart';
 
-function App() {
+const App = () => {
   return (
-    <BarChart/>
+    <Routes>
+      <Route path="/" element={<BarChart />} />
+      <Route path="/details/:factoryId/:monthNumber" element={<DetailChart />} />
+    </Routes>
   );
-}
-
+};
 export default App;

@@ -1,4 +1,4 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Response } from 'express';
 
@@ -14,5 +14,13 @@ export class ProductsController {
         } catch (error) {
             res.status(500).send('Ошибка');
         }
+    }
+    
+    @Get(':factoryId/:monthNumber')
+    async getProductsByFactoryAndMonth(
+        @Param('factoryId') factoryId: number,
+        @Param('monthNumber') monthNumber: number,
+    ): Promise<{ product1: number; product2: number }> {
+        return this.productsService.getProductsByFactoryAndMonth(factoryId, monthNumber);
     }
 }
