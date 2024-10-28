@@ -29,7 +29,7 @@ const DetailChart = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/products/${factoryId}/${monthNumber}`
+          `http://localhost:3001/products/${factoryId}/${monthNumber}`
         );
         setData(response.data);
       } catch (error) {
@@ -50,7 +50,7 @@ const DetailChart = () => {
   ];
 
   return (
-    <div>
+    <div className="page">
       <h2>
         Статистика по продукции фабрики {Number(factoryId) === 1 ? 'A' : 'B'} в
         месяце {months[Number(monthNumber) - 1]}
@@ -62,14 +62,14 @@ const DetailChart = () => {
           cx={400}
           cy={200}
           outerRadius={150}
-          fill="#8884d8"
+          fill="#84d88e"
           label={(label) => `${label.value}т`}
           style={{ stroke: 'none' }}
         >
           {pieData.map((_, index) => (
             <Cell
               key={`cell-${index}`}
-              fill={index === 0 ? '#8884d8' : '#82ca9d'}
+              fill={index === 0 ? 'rgb(0, 127, 0)' : 'rgb(254, 165, 0)'}
             />
           ))}
         </Pie>

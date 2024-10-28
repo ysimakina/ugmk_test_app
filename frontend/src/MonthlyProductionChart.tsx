@@ -1,4 +1,4 @@
-import { ChangeEvent, Fragment, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   BarChart,
@@ -26,15 +26,13 @@ interface MonthlyData {
   monthIndex: number;
 }
 
-interface ActivePayload {
-  name: string;
-  payload: {
-    monthIndex: number;
-  };
-}
+type FactoryName = {
+  name: 'Фабрика A' | 'Фабрика Б';
+};
 
-interface BarClickData {
-  activePayload?: ActivePayload[];
+interface TooltipPayload {
+  tooltipPayload: FactoryName[];
+  monthIndex: number;
 }
 
 enum ProductFilter {
@@ -51,13 +49,13 @@ const MonthlyProductionChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/products');
+        const response = await axios.get('http://localhost:3001/products');
         setData(response.data);
       } catch (error) {
         console.error('Ошибка при получении данных:', error);
       }
     };
-
+    
     fetchData();
   }, []);
 
@@ -102,12 +100,10 @@ const MonthlyProductionChart = () => {
 
   const formattedData = processData(data);
 
-  const handleBarClick = (data: BarClickData, ...args: unknown[]) => {
-    console.log(data);
+  const handleBarClick = (data: TooltipPayload) => {
     if (data.tooltipPayload) {
       const factoryId = data.tooltipPayload[0].name === 'Фабрика A' ? 1 : 2;
       const monthNumber = data.monthIndex;
-      console.log(factoryId);
       navigate(`/details/${factoryId}/${monthNumber}`);
     }
   };
@@ -118,21 +114,22 @@ const MonthlyProductionChart = () => {
   };
 
   return (
-    <div>
-      <div>
-        <label htmlFor="productFilter">Фильтр по типу продукции </label>
+    <div className="bar-chart">
+      <div className="filter-bar bar-chart__wrapper">
+        <label htmlFor="productFilter">Фильтр по типу продукции</label>
         <select
           id="productFilter"
           value={localStorage.getItem('filter') ?? filter}
           onChange={handeleSelectChange}
         >
-          <option value="all">Всё</option>
+          <option value="all">Все продукты</option>
           <option value="product1">Продукт 1</option>
           <option value="product2">Продукт 2</option>
         </select>
       </div>
 
       <BarChart
+        className="bar-chart__wrapper"
         width={800}
         height={400}
         data={formattedData}
@@ -143,8 +140,18 @@ const MonthlyProductionChart = () => {
         <YAxis />
         <Tooltip formatter={(value) => `${value}т`} />
         <Legend />
-        <Bar dataKey="factoryA" fill="#8884d8" name="Фабрика A" onClick={handleBarClick} />
-        <Bar dataKey="factoryB" fill="#82ca9d" name="Фабрика B" onClick={handleBarClick} />
+        <Bar
+          dataKey="factoryA"
+          fill="#ff0000"
+          name="Фабрика A"
+          onClick={handleBarClick}
+        />
+        <Bar
+          dataKey="factoryB"
+          fill="#2200ff"
+          name="Фабрика B"
+          onClick={handleBarClick}
+        />
       </BarChart>
     </div>
   );

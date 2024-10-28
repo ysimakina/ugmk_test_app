@@ -1,4 +1,4 @@
-import BarChart from './BarChart';
+import BarChart from './MonthlyProductionChart';
 import { Routes, Route } from 'react-router-dom'; 
 import DetailChart from './DetailChart';
 
