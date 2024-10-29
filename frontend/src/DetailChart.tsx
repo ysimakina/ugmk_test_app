@@ -2,28 +2,16 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
+import { months } from '../constants';
 
-const months = [
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь',
-];
+interface ProductData {
+  product1: number;
+  product2: number;
+}
 
 const DetailChart = () => {
   const { factoryId, monthNumber } = useParams();
-  const [data, setData] = useState<{
-    product1: number;
-    product2: number;
-  } | null>(null);
+  const [data, setData] = useState<ProductData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,7 +57,7 @@ const DetailChart = () => {
           {pieData.map((_, index) => (
             <Cell
               key={`cell-${index}`}
-              fill={index === 0 ? 'rgb(0, 127, 0)' : 'rgb(254, 165, 0)'}
+              fill={index === 0 ? '#007f00' : '#fea500'}
             />
           ))}
         </Pie>
