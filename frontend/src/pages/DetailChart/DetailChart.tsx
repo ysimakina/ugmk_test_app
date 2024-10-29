@@ -2,16 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
-import { months } from '../constants';
-
-interface ProductData {
-  product1: number;
-  product2: number;
-}
+import { months } from '../../../constants';
+import { FactoryData } from '../../types';
 
 const DetailChart = () => {
   const { factoryId, monthNumber } = useParams();
-  const [data, setData] = useState<ProductData | null>(null);
+  const [data, setData] = useState<FactoryData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {

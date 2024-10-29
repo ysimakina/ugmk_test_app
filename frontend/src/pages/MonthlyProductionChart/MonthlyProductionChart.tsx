@@ -10,14 +10,8 @@ import {
   Legend,
 } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-
-interface Product {
-  id: number;
-  factory_id: number;
-  date: string;
-  product1: number;
-  product2: number;
-}
+import './MonthlyProductionChart.css';
+import { FactoryData } from '../../types';
 
 interface MonthlyData {
   month: string;
@@ -42,7 +36,7 @@ enum ProductFilter {
 }
 
 const MonthlyProductionChart = () => {
-  const [data, setData] = useState<Product[]>([]);
+  const [data, setData] = useState<FactoryData[]>([]);
   const [filter, setFilter] = useState<ProductFilter>(ProductFilter.all);
   const navigate = useNavigate();
 
@@ -59,7 +53,7 @@ const MonthlyProductionChart = () => {
     fetchData();
   }, []);
 
-  const processData = (products: Product[]) => {
+  const processData = (products: FactoryData[]) => {
     const monthlyData: Record<number, MonthlyData> = {};
 
     products.forEach((product) => {
