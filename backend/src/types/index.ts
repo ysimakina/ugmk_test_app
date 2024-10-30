@@ -4,3 +4,7 @@ export interface FactoryData {
   product1: number;
   product2: number;
 }
+
+export interface ProductsData {
+  products: FactoryData[];
+}

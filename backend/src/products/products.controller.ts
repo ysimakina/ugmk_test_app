@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { Controller, Get, NotFoundException, Param, Res } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Res } from '@nestjs/common';
 
 import { FactoryData } from 'src/types';
 
@@ -10,7 +10,7 @@ export class ProductsController {
     constructor(private readonly productsService: ProductsService) {}
 
     @Get()
-    async getFactoryData(@Res() res: Response) {
+    async getFactoryData(@Res({ passthrough: false }) res: Response) {
         try {
             const products = await this.productsService.getFactoryData(); 
             res.send(products);
@@ -21,8 +21,8 @@ export class ProductsController {
     
     @Get(':factoryId/:monthNumber')
     async getProductsByFactoryAndMonth(
-        @Param('factoryId') factoryId: number,
-        @Param('monthNumber') monthNumber: number,
+        @Param('factoryId', ParseIntPipe) factoryId: number,
+        @Param('monthNumber', ParseIntPipe) monthNumber: number,
     ): Promise<Partial<FactoryData>> {
         return this.productsService.getProductsByFactoryAndMonth(factoryId, monthNumber);
     }

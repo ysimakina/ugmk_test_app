@@ -1,43 +1,43 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { PieChart, Pie, Cell, Legend } from 'recharts';
-import { months } from '../../../constants';
+import { Cell, Legend, Pie, PieChart } from 'recharts';
+
+import { fetchDetailsFactoryData } from '../../api';
+import { months } from '../../constants';
 import { FactoryData } from '../../types';
+
+const getPieData = (factoryData: FactoryData) => [
+  { name: 'Продукт 1', value: factoryData.product1 },
+  { name: 'Продукт 2', value: factoryData.product2 },
+];
 
 const DetailChart = () => {
   const { factoryId, monthNumber } = useParams();
-  const [data, setData] = useState<FactoryData | null>(null);
+  const [factoryData, setFactoryData] = useState<FactoryData | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3001/products/${factoryId}/${monthNumber}`
-        );
-        setData(response.data);
-      } catch (error) {
-        console.error('Ошибка при получении данных:', error);
+    (() => {
+      if (factoryId && monthNumber) {
+        return fetchDetailsFactoryData(factoryId, monthNumber)
+          .then(setFactoryData)
+          .catch((error) =>
+            console.error('Ошибка при получении данных:', error)
+          );
       }
-    };
-
-    fetchData();
+    })();
   }, [factoryId, monthNumber]);
-
-  if (!data) {
+  
+  if (!factoryData) {
     return <p>Загрузка...</p>;
   }
-
-  const pieData = [
-    { name: 'Продукт 1', value: data.product1 },
-    { name: 'Продукт 2', value: data.product2 },
-  ];
+  
+  const pieData = getPieData(factoryData);
 
   return (
     <div className="page">
       <h2>
-        Статистика по продукции фабрики {Number(factoryId) === 1 ? 'A' : 'B'} в
-        месяце {months[Number(monthNumber) - 1]}
+        Статистика по продукции фабрики {factoryId === '1' ? 'A' : 'B'} в месяце{' '}
+        {months[Number(monthNumber) - 1]}
       </h2>
       <PieChart width={800} height={400}>
         <Pie

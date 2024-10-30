@@ -12,3 +12,5 @@ export const months = [
   'Ноябрь',
   'Декабрь',
 ];
+
+export const FILTER = 'FILTER';

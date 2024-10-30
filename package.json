@@ -13,6 +13,7 @@
     "concurrently": "^9.0.1"
   },
   "dependencies": {
-    "dockerize": "^0.1.0"
+    "dockerize": "^0.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1"
   }
 }

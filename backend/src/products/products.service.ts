@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
-import { FactoryData } from 'src/types';
-
-interface Data {
-  products: FactoryData[];
-}
+import { FactoryData, ProductsData } from 'src/types';
 
 @Injectable()
 export class ProductsService {
@@ -19,9 +15,9 @@ export class ProductsService {
       'products.json',
     );
     const jsonData = await fs.readFile(filePath, 'utf-8');
-    const products: Data = JSON.parse(jsonData);
+    const { products }: ProductsData = JSON.parse(jsonData);
 
-    return products.products;
+    return products;
   }
 
   async getProductsByFactoryAndMonth(
@@ -29,8 +25,7 @@ export class ProductsService {
     monthNumber: number,
   ): Promise<Partial<FactoryData>> {
     const products = await this.getFactoryData();
-    let product1Total = 0;
-    let product2Total = 0;
+    const totalProducts = [0, 0];
 
     products.forEach((product) => {
       const productDate = new Date(product.date);
@@ -38,14 +33,14 @@ export class ProductsService {
       if (isNaN(productDate.getTime())) return;
       const productMonth = productDate.getMonth() + 1;
       if (
-        product.factory_id === Number(factoryId) &&
+        product.factory_id === factoryId &&
         productMonth === Number(monthNumber)
       ) {
-        product1Total += product.product1;
-        product2Total += product.product2;
+        totalProducts[0] += product.product1;
+        totalProducts[1] += product.product2;
       }
     });
 
-    return { product1: product1Total, product2: product2Total };
+    return { product1: totalProducts[0], product2: totalProducts[1] };
   }
 }

@@ -1,17 +1,22 @@
-import { ChangeEvent, useEffect, useState } from 'react';
-import axios from 'axios';
+import './MonthlyProductionChart.css';
+
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
 } from 'recharts';
-import { useNavigate } from 'react-router-dom';
-import './MonthlyProductionChart.css';
-import { FactoryData } from '../../types';
+
+import { fetchFactoriesData } from '../../api';
+import SelectProduct from '../../components/SelectProduct';
+import { FILTER } from '../../constants';
+import { FactoryData, ProductFilter } from '../../types';
+import { getItemFromLocalStorage, setItemInLocalStorage } from '../../utils/localStorageUtils';
 
 interface MonthlyData {
   month: string;
@@ -29,68 +34,62 @@ interface TooltipPayload {
   monthIndex: number;
 }
 
-enum ProductFilter {
-  all = 'all',
-  product1 = 'product1',
-  product2 = 'product2',
-}
-
 const MonthlyProductionChart = () => {
   const [data, setData] = useState<FactoryData[]>([]);
-  const [filter, setFilter] = useState<ProductFilter>(ProductFilter.all);
+  const [filter, setFilter] = useState(
+    () => getItemFromLocalStorage(FILTER) as ProductFilter ?? ProductFilter.all
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/products');
-        setData(response.data);
-      } catch (error) {
-        console.error('Ошибка при получении данных:', error);
-      }
-    };
-    
-    fetchData();
+    (() => {
+      return fetchFactoriesData()
+        .then(setData)
+        .catch((error) => console.error('Ошибка при получении данных:', error));
+    })();
   }, []);
 
-  const processData = (products: FactoryData[]) => {
-    const monthlyData: Record<number, MonthlyData> = {};
+  const processData = useCallback(
+    (products: FactoryData[]) => {
+      const monthlyData: Record<number, MonthlyData> = {};
 
-    products.forEach((product) => {
-      const date = new Date(product.date);
-      const monthIndex = date.getMonth() + 1;
-      if (isNaN(monthIndex)) return;
+      products.forEach((product) => {
+        const date = new Date(product.date);
+        const monthIndex = date.getMonth() + 1;
+        if (!Number.isFinite(monthIndex)) return;
 
-      if (!monthlyData[monthIndex]) {
-        monthlyData[monthIndex] = {
-          month: date.toLocaleString('default', { month: 'short' }),
-          factoryA: 0,
-          factoryB: 0,
-          monthIndex,
-        };
-      }
-
-      if (filter !== 'all') {
-        if (product.factory_id === 1) {
-          monthlyData[monthIndex].factoryA += product[filter];
-        } else if (product.factory_id === 2) {
-          monthlyData[monthIndex].factoryB += product[filter];
+        if (!monthlyData[monthIndex]) {
+          monthlyData[monthIndex] = {
+            month: date.toLocaleString('default', { month: 'short' }),
+            factoryA: 0,
+            factoryB: 0,
+            monthIndex,
+          };
         }
-      } else {
-        const productValue = product.product1 + product.product2;
 
-        if (product.factory_id === 1) {
-          monthlyData[monthIndex].factoryA += productValue;
-        } else if (product.factory_id === 2) {
-          monthlyData[monthIndex].factoryB += productValue;
+        const productValue =
+          filter !== ProductFilter.all
+            ? product[filter]
+            : product.product1 + product.product2;
+
+        switch (product.factory_id) {
+          case 1:
+            monthlyData[monthIndex].factoryA += productValue;
+            break;
+          case 2:
+            monthlyData[monthIndex].factoryB += productValue;
+            break;
+          default:
+            break;
         }
-      }
-    });
+      });
 
-    return Object.values(monthlyData).sort(
-      (a, b) => a.monthIndex - b.monthIndex
-    );
-  };
+      return Object.values(monthlyData).sort(
+        (a, b) => a.monthIndex - b.monthIndex
+      );
+    },
+    [filter]
+  );
 
   const formattedData = processData(data);
 
@@ -104,24 +103,15 @@ const MonthlyProductionChart = () => {
 
   const handeleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setFilter(e.target.value as ProductFilter);
-    localStorage.setItem('filter', e.target.value);
+    setItemInLocalStorage(FILTER, e.target.value);
   };
 
   return (
     <div className="bar-chart">
-      <div className="filter-bar bar-chart__wrapper">
-        <label htmlFor="productFilter">Фильтр по типу продукции</label>
-        <select
-          id="productFilter"
-          value={localStorage.getItem('filter') ?? filter}
-          onChange={handeleSelectChange}
-        >
-          <option value="all">Все продукты</option>
-          <option value="product1">Продукт 1</option>
-          <option value="product2">Продукт 2</option>
-        </select>
-      </div>
-
+      <SelectProduct
+        filter={filter as ProductFilter}
+        handeleSelectChange={handeleSelectChange}
+      />
       <BarChart
         className="bar-chart__wrapper"
         width={800}
