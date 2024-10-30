@@ -35,7 +35,7 @@ interface TooltipPayload {
 }
 
 const MonthlyProductionChart = () => {
-  const [data, setData] = useState<FactoryData[]>([]);
+  const [factoryData, setFactoryData] = useState<FactoryData[]>([]);
   const [filter, setFilter] = useState(
     () => getItemFromLocalStorage(FILTER) as ProductFilter ?? ProductFilter.all
   );
@@ -44,7 +44,7 @@ const MonthlyProductionChart = () => {
   useEffect(() => {
     (() => {
       return fetchFactoriesData()
-        .then(setData)
+        .then(setFactoryData)
         .catch((error) => console.error('Ошибка при получении данных:', error));
     })();
   }, []);
@@ -91,7 +91,7 @@ const MonthlyProductionChart = () => {
     [filter]
   );
 
-  const formattedData = processData(data);
+  const formattedData = processData(factoryData);
 
   const handleBarClick = (data: TooltipPayload) => {
     if (data.tooltipPayload) {
