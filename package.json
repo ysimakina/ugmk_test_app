@@ -1,0 +1,19 @@
+{
+  "name": "ugmk_test_app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"npm run start:dev:frontend\" \"npm run start:dev:backend\"",
+    "postinstall": "concurrently \"cd frontend && npm install\" \"cd backend && npm install\"",
+    "start:dev:frontend": "cd frontend && npm run dev",
+    "start:dev:backend": "cd backend && npm run start:dev",
+    "dockerize": "docker compose build",
+    "start-container": "docker-compose up --abort-on-container-exit && docker-compose down --remove-orphans"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  },
+  "dependencies": {
+    "dockerize": "^0.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1"
+  }
+}
